@@ -1,4 +1,4 @@
-package nz.co.xtra.smith.mansill;
+package com.msmith.DIYUSB;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

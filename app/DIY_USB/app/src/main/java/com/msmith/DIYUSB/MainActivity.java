@@ -1,4 +1,4 @@
-package nz.co.xtra.smith.mansill;
+package com.msmith.DIYUSB;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,11 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import nz.co.xtra.smith.mansill.R;
-
 public class MainActivity extends AppCompatActivity {
 
-    List<nz.co.xtra.smith.mansill.USB> USBList = new ArrayList<nz.co.xtra.smith.mansill.USB>();
+    List<USB> USBList = new ArrayList<USB>();
     private Context context = this;
     String filename = "USBData";
 
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 try{
                     OutputStreamWriter outputStream = new OutputStreamWriter(context.openFileOutput(filename, Context.MODE_PRIVATE));
 
-                    for(nz.co.xtra.smith.mansill.USB u : USBList){
+                    for(USB u : USBList){
                         outputStream.write(u.toString());
                     }
                     outputStream.close();
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //If its the app is opened
-        if((nz.co.xtra.smith.mansill.USB)getIntent().getSerializableExtra("USB 0") == null) {
+        if((USB)getIntent().getSerializableExtra("USB 0") == null) {
             readFile();
         }
 
@@ -94,10 +92,10 @@ public class MainActivity extends AppCompatActivity {
 
     //Opens the edit USB activity
     public void openEditUSB(){
-        Intent intent = new Intent(this, nz.co.xtra.smith.mansill.EditUSB.class);
+        Intent intent = new Intent(this, EditUSB.class);
         //Adds all of the USBs to the intent
         int count = 0;
-        for(nz.co.xtra.smith.mansill.USB u : USBList){
+        for(USB u : USBList){
             String title = "USB " + count;
             intent.putExtra(title, u);
             count ++;
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void printUSBList(){
-        for(nz.co.xtra.smith.mansill.USB u : USBList){
+        for(USB u : USBList){
             System.out.println(u.getName());
         }
     }
@@ -121,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 s = br.readLine();
                 while(s!=null){
                     StringTokenizer st = new StringTokenizer(s, ",");
-                    USBList.add(new nz.co.xtra.smith.mansill.USB(st.nextToken(), st.nextToken(), st.nextToken()));
+                    USBList.add(new USB(st.nextToken(), st.nextToken(), st.nextToken()));
                     s = br.readLine();
                 }
             }
@@ -135,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     public void displayUSBs(){
         TableLayout table = (TableLayout) findViewById(R.id.tableUSB);
         //Writes the USB's to the screen
-        for(nz.co.xtra.smith.mansill.USB u : USBList){
+        for(USB u : USBList){
             TableRow tr = new TableRow(this);
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
@@ -155,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         int count = 0;
         while(moreUSBs){
             String title = "USB " + count;
-            nz.co.xtra.smith.mansill.USB temp = (nz.co.xtra.smith.mansill.USB)getIntent().getSerializableExtra(title);
+            USB temp = (USB)getIntent().getSerializableExtra(title);
             count ++;
             if(temp == null){
                 moreUSBs = false;

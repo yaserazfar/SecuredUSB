@@ -1,5 +1,8 @@
-package nz.co.xtra.smith.mansill;
+package com.msmith.DIYUSB;
 
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,25 +16,31 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import nz.co.xtra.smith.mansill.R;
+import java.util.Set;
+import java.util.UUID;
 
 public class EditUSB extends AppCompatActivity {
 
     String name = "";
     String password = "";
     String pin = "";
-    String temp = "";
     Boolean justPasswordHitEdit = false;
     Boolean justPinHitEdit = false;
     private Context context = this;
-    nz.co.xtra.smith.mansill.USB tempUSB;
+    USB tempUSB;
 
+    BluetoothAdapter myBluetoothAdapter;
+    BluetoothSocket myBluetoothSocket;
+    BluetoothDevice mBluetoothDevice;
+    OutputStream myOutputStream;
+    InputStream myInputStream;
 
-    List<nz.co.xtra.smith.mansill.USB> USBList = new ArrayList<nz.co.xtra.smith.mansill.USB>();
-    //enum USBStates {SAVE, DELETE, EDIT};
+    List<USB> USBList = new ArrayList<USB>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +52,7 @@ public class EditUSB extends AppCompatActivity {
         int count = 0;
         while(moreUSBs){
             String title = "USB " + count;
-            nz.co.xtra.smith.mansill.USB temp = (nz.co.xtra.smith.mansill.USB)getIntent().getSerializableExtra(title);
+            USB temp = (USB)getIntent().getSerializableExtra(title);
             count ++;
             if(temp == null){
                 moreUSBs = false;
@@ -66,7 +75,8 @@ public class EditUSB extends AppCompatActivity {
 
         //Sets up the confirm button on click method
         Button btnConfirm = (Button)findViewById(R.id.btnConfirm);
-
+        //Sets up the sync usb button on click method
+        Button btnSyncUSB = (Button)findViewById(R.id.btnSyncUSB);
 
         //On password switch value chang
         passwordSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -144,7 +154,7 @@ public class EditUSB extends AppCompatActivity {
                 else {
                     Boolean nameUsed = false;
 
-                    for(nz.co.xtra.smith.mansill.USB u: USBList){
+                    for(USB u: USBList){
                         if(u.name.equals(name)){
                             nameUsed = true;
                             break;
@@ -167,15 +177,69 @@ public class EditUSB extends AppCompatActivity {
                 }
             }
         });
+
+        //The on click event method for the sync USB button
+        btnSyncUSB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                findBT();
+                openBT();
+
+            }
+        });
+    }
+
+    public void findBT(){
+        myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        //myBluetoothAdapter.enable();
+        //If the device has no bluetooth
+        if(myBluetoothAdapter == null){
+            System.out.println("No bluetooth adapter available");
+        }
+
+        //Enables the bluetooth adapter is its no adapter
+        if(!myBluetoothAdapter.isEnabled()){
+            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBluetooth, 0);
+        }
+
+        //Some how figure out which device to pair to
+        Set<BluetoothDevice> pairedDevices = myBluetoothAdapter.getBondedDevices();
+        if(pairedDevices.size() > 0){
+            for(BluetoothDevice device : pairedDevices){
+
+            }
+        }
+    }
+
+    public void openBT(){
+        try {
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
+            myBluetoothSocket = mBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+            myBluetoothSocket.connect();
+            myOutputStream = myBluetoothSocket.getOutputStream();
+            myInputStream = myBluetoothSocket.getInputStream();
+
+            beginListenForData();
+
+            System.out.println("Bluetooth Opened");
+        }
+        catch (IOException ex){
+            System.out.println("Error: " + ex.toString());
+        }
+    }
+
+    public void beginListenForData(){
+
     }
 
     //Opens the main activity and gives a USB object back to the main activity
     public void openMainActivity(String state){
-        Intent intent = new Intent(this, nz.co.xtra.smith.mansill.MainActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
 
-        USBList.add(new nz.co.xtra.smith.mansill.USB(name, password, pin));
+        USBList.add(new USB(name, password, pin));
         int count = 0;
-        for(nz.co.xtra.smith.mansill.USB u : USBList){
+        for(USB u : USBList){
             String title = "USB " + count;
             intent.putExtra(title, u);
             count ++;
@@ -218,6 +282,9 @@ public class EditUSB extends AppCompatActivity {
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                //Sets up the password switch
+                final Switch passwordSwitch = (Switch) findViewById(R.id.switchPassword);
+                passwordSwitch.setChecked(false);
             }
         });
 
@@ -261,6 +328,9 @@ public class EditUSB extends AppCompatActivity {
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                //Sets up the password switch
+                final Switch pinSwitch = (Switch) findViewById(R.id.switchPin);
+                pinSwitch.setChecked(false);
             }
         });
 

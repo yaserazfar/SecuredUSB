@@ -1,4 +1,4 @@
-package nz.co.xtra.smith.mansill;
+package com.msmith.DIYUSB;
 
 import java.io.Serializable;
 
