@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     //Displays the USBs to the table layput
     public void displayUSBs(){
         TableLayout table = (TableLayout) findViewById(R.id.tableUSB);
-        //Writes the USB's to the screen
+        //Writes the USBs to the screen
         for(USB u : USBList){
             TableRow tr = new TableRow(this);
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
