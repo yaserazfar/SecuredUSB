@@ -8,8 +8,16 @@ public class USB implements Serializable {
     public String name;
     public String password;
     public String pin;
+    public String usbKey;
     //public USBKey
     //int num;
+
+    public USB(String name, String password, String pin, String usbKey){
+        this.name = name;
+        this.password = password;
+        this.pin = pin;
+        this.usbKey = usbKey;
+    }
 
     //Constructs a USB object
     public USB(String name, String password, String pin){
@@ -64,7 +72,7 @@ public class USB implements Serializable {
         if(this.pin.equals("")){
             tempPin = " ";
         }
-        return this.getName() + "," + tempPassword + "," + tempPin + "\n";
+        return this.getName() + "," + tempPassword + "," + tempPin +  "," + usbKey + "\n";
     }
 }
 

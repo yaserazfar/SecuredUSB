@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,9 +23,13 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -35,20 +40,27 @@ public class EditUSB extends AppCompatActivity {
     String name = "";
     String password = "";
     String pin = "";
+    String usbKey = "";
     Boolean justPasswordHitEdit = false;
     Boolean justPinHitEdit = false;
     private Context context = this;
     USB tempUSB;
 
+
     BluetoothAdapter myBluetoothAdapter;
     BluetoothSocket myBluetoothSocket;
     BluetoothDevice myBluetoothDevice;
     OutputStream myOutputStream;
+    BufferedWriter bw;
     InputStream myInputStream;
+    BufferedReader br;
 
-    /*(
+    Thread workerThread;
 
-    */
+    byte[] readBuffer;
+    int readBufferPosition;
+    int counter;
+    volatile boolean stopWorker;
 
     List<USB> USBList = new ArrayList<USB>();
     Set<BluetoothDevice> pairedDevices;
@@ -57,6 +69,8 @@ public class EditUSB extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_usb);
+
+
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
@@ -79,6 +93,8 @@ public class EditUSB extends AppCompatActivity {
             }
 
         }
+
+        myBluetoothDevice = (BluetoothDevice)getIntent().getParcelableExtra("Bluetooth Device");
 
         //Sets up the password switch
         final Switch passwordSwitch = (Switch) findViewById(R.id.switchPassword);
@@ -186,8 +202,13 @@ public class EditUSB extends AppCompatActivity {
                     if (password.equals("") && pin.equals("")) {
                         errorPrompt("You must set a 4 digit pin or a password");
                     } else {
-                        System.out.println("l " + name + " l " + password + " l " + pin + " l");
-                        openMainActivity("Save");
+                        if(usbKey.equals("")){
+                            errorPrompt("You must sync your USB");
+                        }
+                        else {
+                            System.out.println("l " + name + " l " + password + " l " + pin + " l");
+                            openMainActivity("Save");
+                        }
                     }
                 }
 
@@ -199,58 +220,11 @@ public class EditUSB extends AppCompatActivity {
         btnSyncUSB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                findBT();
-                //openBT();
+                //findBT();
+                openBT();
 
             }
         });
-    }
-
-    public void findBT(){
-        myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        //myBluetoothAdapter.enable();
-        //If the device has no bluetooth
-        if(myBluetoothAdapter == null){
-            //System.out.println("No bluetooth adapter available");
-            Toast.makeText(getApplicationContext(), "No bluetooth adapter available", Toast.LENGTH_SHORT).show();
-        }
-        else {
-
-            //Enables bluetooth if bluetooth is off
-            if (!myBluetoothAdapter.isEnabled()) {
-                Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivityForResult(enableBluetooth, 0);
-            }
-            //If the device has bluetooth enabled
-            else {
-                myBluetoothAdapter.getProfileProxy(this, serviceListener, BluetoothProfile.A2DP);
-
-                if(myBluetoothDevice != null) {
-                    Toast.makeText(getApplicationContext(), "Connected to a Bluetooth Device", Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(getApplicationContext(), "Please Connect to a Laptop", Toast.LENGTH_SHORT).show();
-                }
-
-                /*
-                //Some how figure out which device to pair to
-                //Set<BluetoothDevice> pairedDevices = myBluetoothAdapter.getBondedDevices();
-                pairedDevices = myBluetoothAdapter.getBondedDevices();
-                if (pairedDevices.size() > 0) {
-                    for (BluetoothDevice device : pairedDevices) {
-                        //mBluetoothDevice = device;
-                        //pairedDevices.add(device);
-                        //pairedDeviceNames.add(device.getName());
-                    }
-                    //promptChooseDevice();
-                } else {
-                    //No paired Bluetooth devices
-                    //errorPrompt("There are no paired devices");
-                    Toast.makeText(getApplicationContext(), "There are no paired devices", Toast.LENGTH_SHORT).show();
-                }
-                */
-            }
-        }
     }
 
     private BluetoothProfile.ServiceListener serviceListener = new BluetoothProfile.ServiceListener() {
@@ -258,7 +232,7 @@ public class EditUSB extends AppCompatActivity {
         public void onServiceConnected(int i, BluetoothProfile bluetoothProfile) {
             for(BluetoothDevice device : bluetoothProfile.getConnectedDevices()){
                 //GETS THE CONNECTED DEVICE
-                myBluetoothDevice = device;
+                //myBluetoothDevice = device;
                 //System.out.println("My Bluetooth Device Name: " + myBluetoothDevice.getName());
             }
         }
@@ -269,71 +243,64 @@ public class EditUSB extends AppCompatActivity {
         }
     };
 
-    public void promptChooseDevice(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(EditUSB.this);
-        View view = getLayoutInflater().inflate(R.layout.dialog_dropdown, null);
-        builder.setTitle("Connect to a paired devices");
-        final Spinner spinner = (Spinner) view.findViewById(R.id.dropDown);
-
-        //Gets the name of all of the paired devices
-        List<String> pairedDeviceNames = new ArrayList<String>();
-        for (BluetoothDevice device : pairedDevices) {
-            pairedDeviceNames.add(device.getName());
-
-        }
-
-        for(String s : pairedDeviceNames){
-            System.out.println(s);
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item, pairedDeviceNames);
-        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        builder.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                String name = spinner.getSelectedItem().toString();
-                for(BluetoothDevice device : pairedDevices){
-                    if(name.equals(device.getName())){
-                        myBluetoothDevice = device;
-                    }
-                }
-                System.out.println("My Bluetooth Device is: " + myBluetoothDevice.getName());
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-
-        builder.setView(view);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-    }
 
     public void openBT(){
-        try {
-            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
-            myBluetoothSocket = myBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-            myBluetoothSocket.connect();
-            myOutputStream = myBluetoothSocket.getOutputStream();
-            myInputStream = myBluetoothSocket.getInputStream();
-
-            beginListenForData();
-
-            System.out.println("Bluetooth Opened");
+        if(myBluetoothDevice != null) {
+            System.out.println("Bluetooth Device is: " + myBluetoothDevice.getName());
+            System.out.println("Bluetooth Address is: " + myBluetoothDevice.getAddress());
         }
-        catch (IOException ex){
-            System.out.println("Error: " + ex.toString());
+        else{
+            System.out.println("My Bluetooth device is null");
         }
-    }
 
-    public void beginListenForData(){
+        workerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Attempting to communicate with the Computer");
+                UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
+
+                try {
+                    myBluetoothSocket = myBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                } catch (IOException ex) {
+                    System.out.println("Could not create a socket");
+                }
+
+                try {
+                    myBluetoothSocket.connect();
+                    System.out.println("Connected");
+                    myOutputStream = myBluetoothSocket.getOutputStream();
+                    myInputStream = myBluetoothSocket.getInputStream();
+
+                    br = new BufferedReader(new InputStreamReader(myInputStream));
+                    bw = new BufferedWriter(new OutputStreamWriter(myOutputStream));
+
+                    //Sends that the connection has been made
+                    myOutputStream.write(49);
+                    System.out.println("Sent char");
+
+                    //WHile the name hasn't been sent
+                    while (usbKey.equals("")) {
+                        usbKey = br.readLine();
+                        System.out.println("USB key is: " + usbKey);
+                        //bw.write(49);
+                    }
+
+                    //Toast.makeText(getApplicationContext(), "USB Synced", Toast.LENGTH_SHORT).show();
+
+                } catch (IOException ex) {
+
+                }
+
+            }
+        });
+        workerThread.start();
+
+
+
+        //beginListenForData();
+
+        //System.out.println("Bluetooth Opened");
+
 
     }
 
@@ -379,13 +346,15 @@ public class EditUSB extends AppCompatActivity {
     public void openMainActivity(String state){
         Intent intent = new Intent(this, MainActivity.class);
 
-        USBList.add(new USB(name, password, pin));
+        USBList.add(new USB(name, password, pin, usbKey));
         int count = 0;
         for(USB u : USBList){
             String title = "USB " + count;
             intent.putExtra(title, u);
             count ++;
         }
+
+        intent.putExtra("Bluetooth Device", myBluetoothDevice);
         startActivity(intent);
     }
 
