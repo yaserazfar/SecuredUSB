@@ -9,9 +9,9 @@ public class USB implements Serializable {
     public String password;
     public String pin;
     public String usbKey;
-    //public USBKey
-    //int num;
 
+
+    //Constructs a usb object with all of the attributes
     public USB(String name, String password, String pin, String usbKey){
         this.name = name;
         this.password = password;
@@ -19,49 +19,14 @@ public class USB implements Serializable {
         this.usbKey = usbKey;
     }
 
-    //Constructs a USB object
+    //Constructs a USB object with no key
     public USB(String name, String password, String pin){
         this.name = name;
         this.password = password;
         this.pin = pin;
-        //this.num = num;
     }
 
-    //Sets the password
-    public void setPassword(String newPassword){
-        this.password = newPassword;
-    }
-
-    //Sets the pin
-    public void setPin(String newPin){
-        this.pin = newPin;
-    }
-
-    //Gets the name
-    public String getName(){ return this.name; }
-
-    //Sets the num
-    //public void setNum(int newNum) {this.num = newNum;}
-
-    //Checks if the password is correct
-    public boolean isCorrectPassword(String password){
-        if(this.password.equals(password)){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    public boolean isCorrectPin(String pin){
-        if(this.pin.equals(pin)){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
+    //Overrides the tostring method for a USB
     public String toString() {
         String tempPassword = this.password;
         String tempPin = this.pin;
@@ -72,7 +37,7 @@ public class USB implements Serializable {
         if(this.pin.equals("")){
             tempPin = " ";
         }
-        return this.getName() + "," + tempPassword + "," + tempPin +  "," + usbKey + "\n";
+        return name + "," + tempPassword + "," + tempPin +  "," + usbKey + "\n";
     }
 }
 
