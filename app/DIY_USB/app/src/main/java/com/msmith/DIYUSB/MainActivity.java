@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,6 +30,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.Buffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -41,9 +46,7 @@ public class MainActivity extends AppCompatActivity {
     BluetoothSocket myBluetoothSocket;
     BluetoothDevice myBluetoothDevice;
     OutputStream myOutputStream;
-    BufferedWriter bw;
     InputStream myInputStream;
-    BufferedReader br;
 
     String usbToDecrypt = "";
 
@@ -57,12 +60,13 @@ public class MainActivity extends AppCompatActivity {
     Boolean hasPassword = true;
     Boolean hasPin = true;
 
+    UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
+
+    //Updates the file containing USBs on the phone
     public void update(){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                File file = new File(context.getFilesDir(), filename);
-
                 try{
                     OutputStreamWriter outputStream = new OutputStreamWriter(context.openFileOutput(filename, Context.MODE_PRIVATE));
 
@@ -79,55 +83,51 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    //Reads data from the bluetooth device
     public void readData(){
         new Thread(new Runnable() {
             @Override
             public void run() {
-                UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
                 try {
                     myBluetoothSocket = myBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-                } catch (IOException ex) {
-                    System.out.println("Could not create a socket");
-                }
-
-                try {
                     myBluetoothSocket.connect();
-                    System.out.println("Connected");
                     myInputStream = myBluetoothSocket.getInputStream();
+                    myOutputStream = myBluetoothSocket.getOutputStream();
 
-                    br = new BufferedReader(new InputStreamReader(myInputStream));
-                    //bw = new BufferedWriter(new OutputStreamWriter(myOutputStream));
+                    BufferedReader br = new BufferedReader(new InputStreamReader(myInputStream));
 
-                    Boolean read = true;
-                    while(read){
+                    //Whiles its waiting to reading a device
+                    while(true){
+                        //System.out.println("Waiting for input");
                         usbToDecrypt = br.readLine();
                         System.out.println("USBkey to decrypt is: " + usbToDecrypt);
-                        read = !decryptAUSB();
+                        decryptAUSB();
+
                     }
-
-                    /*
-                    myOutputStream = myBluetoothSocket.getOutputStream();
-                    //myInputStream = myBluetoothSocket.getInputStream();
-
-                    myOutputStream.write(50);
-                    System.out.println("Sent Decrypt Signal");
-                    */
-
-
                 }
                 catch(IOException ex){
-
+                    //Tells the user an error occured
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Error: Couldn't connect to the Bluetooth Device", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         }).start();
     }
 
 
-    public Boolean decryptAUSB(){
+    //Trys to decrypt a usb
+    public void decryptAUSB(){
         Boolean found = false;
         for(USB u : USBList){
             //If the usb to decrypt is found
             if(u.usbKey.equals(usbToDecrypt)){
+
+                hasPassword = hasPin = true;
+
                 found = true;
                 theUSBToDecrypt = u;
 
@@ -135,37 +135,53 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Password: " + u.password);
                 System.out.println("Pin:" + u.pin);
 
-                if(u.password.equals(" ")){
+                //Sets up if the usb has a password
+                if(u.password.equals("")){
                     hasPassword = false;
                 }
 
-                if(u.pin.equals(" ")){
+                //Sets up if the usb has a pin
+                if(u.pin.equals("")){
                     hasPin = false;
                 }
 
                 System.out.println("Password: " + hasPassword+", " + "Pin: " + hasPin);
 
+
+                //Prompts the user to enter a password
                 if(hasPassword) {
+                    System.out.println("Prompting password");
+                    //prompt password will prompt the user to enter a pin if the usb has a pin
                     promptPassword();
                 }
-
-                if(hasPin){
+                //If there is no password, prompts user to enter pin
+                else{
+                    System.out.println("Prompting pin");
                     promptPin();
                 }
 
             }
         }
 
+        //If the USB trying to be decrypted wasn't found
         if(!found){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    //Sends an error messgae
+                    Toast.makeText(getApplicationContext(), "That USB was not found", Toast.LENGTH_SHORT).show();
+                }
+            });
             System.out.println("USB not found");
         }
-        return found;
     }
 
+    //Prompts the user to enter the password
     public void promptPassword(){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                //Sets up the alert dialog
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 View view = getLayoutInflater().inflate(R.layout.dialog_password, null);
                 builder.setTitle("Please enter password for: " + theUSBToDecrypt.name);
@@ -175,14 +191,26 @@ public class MainActivity extends AppCompatActivity {
                 builder.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //If the user entered the correct password
                         if(theUSBToDecrypt.password.equals(result.getText().toString())){
                             hasPassword = false;
+                            //If the USB has a pin, prompts the user to enter the pin
                             if(hasPin){
                                 promptPin();
                             }
                             else{
                                 sendDecryptSignal();
                             }
+
+                        }
+                        else{
+                            //Tells the user that they entered the wrong password
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Error: Incorrect Password", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     }
                 });
@@ -190,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                     }
                 });
 
@@ -201,38 +228,50 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Prompts the user to enter the pin
     public void promptPin(){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                //Sets up the alert dialog
                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 View view = getLayoutInflater().inflate(R.layout.dialog_password, null);
                 builder.setTitle("Please enter pin for: " + theUSBToDecrypt.name);
 
                 final EditText result = view.findViewById(R.id.txtPassword);
 
+                //Sets up the dialog to enter a pin
+                result.setInputType(InputType.TYPE_CLASS_NUMBER);
+                result.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
                 builder.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //If the user entered the correct pin
                         if(theUSBToDecrypt.pin.equals(result.getText().toString())){
                             hasPin = false;
-                            if(hasPassword){
-                                promptPassword();
-                            }
-                            else{
-                                sendDecryptSignal();
-                            }
+                            sendDecryptSignal();
+                        }
+                        else{
+                            //Tells the user that they entered the wrong password
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Error: Incorrect Password", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     }
                 });
 
+                //Cancel button
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                     }
                 });
 
+                //Displays the alert dialog
                 builder.setView(view);
                 AlertDialog alert = builder.create();
                 alert.show();
@@ -240,103 +279,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    Handler passwordHandler;
-
-    Handler pinHandler;
-
     public void sendDecryptSignal() {
-        /*
-        System.out.println("Attempting to send decrypt signal");
-        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
         try {
-            myBluetoothSocket = myBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-        } catch (IOException ex) {
-            System.out.println("Could not create a socket");
-        }
-        */
-        try {
-            System.out.println("Attempting to Connect");
-            //myBluetoothSocket.connect();
-            System.out.println("Connected");
-            myOutputStream = myBluetoothSocket.getOutputStream();
-            //myInputStream = myBluetoothSocket.getInputStream();
-
+            //Sends the decrypt signal
             myOutputStream.write(50);
+            Toast.makeText(getApplicationContext(), "USB Decrypted!", Toast.LENGTH_SHORT).show();
             System.out.println("Sent Decrypt Signal");
+            myBluetoothSocket.close();
+            readData();
 
         } catch (IOException ex) {
-
+            Toast.makeText(getApplicationContext(), "Error, Could not send the decrypt signal", Toast.LENGTH_SHORT).show();
         }
 
     }
-
-
-
-    /*
-    public void promptPassword(String name){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = getLayoutInflater().inflate(R.layout.dialog_password, null);
-        builder.setTitle("Please enter password for: " + name);
-
-        final EditText result = view.findViewById(R.id.txtPassword);
-
-        builder.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if(theUSBToDecrypt.password.equals(result.getText().toString())){
-                    hasPassword = false;
-                }
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-
-        builder.setView(view);
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    public void promptPin(String name){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View view = getLayoutInflater().inflate(R.layout.dialog_password, null);
-        builder.setTitle("Please enter pin for: " + name);
-
-        final EditText result = view.findViewById(R.id.txtPassword);
-
-        builder.setPositiveButton("Enter", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if(theUSBToDecrypt.pin.equals(result.getText().toString())){
-                    hasPin = false;
-                }
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-
-        builder.setView(view);
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-    */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        passwordHandler = new Handler();
-        pinHandler = new Handler();
 
         //If its the app is opened
         if((USB)getIntent().getSerializableExtra("USB 0") == null) {
@@ -348,19 +309,17 @@ public class MainActivity extends AppCompatActivity {
             promptPairDevice();
         }
         else{
+            System.out.println("Setting up bluetooth device");
             myBluetoothDevice = (BluetoothDevice)getIntent().getParcelableExtra("Bluetooth Device");
             System.out.println("Attempting to read Data");
             readData();
         }
 
-        //Reads the USB's from the edit USB activity
+        //Reads the USBs from the edit USB activity
         readUSBsFromEdit();
 
-        //Display USB's
+        //Display USBs
         displayUSBs();
-
-        //Prints the USB list to the console
-        printUSBList();
 
 
         //Sets up the on click method for the Add New USB button
@@ -383,13 +342,6 @@ public class MainActivity extends AppCompatActivity {
                 update();
             }
         });
-
-        //readData();
-
-        //unlockAUSB();
-
-
-
     }
 
 
@@ -405,6 +357,13 @@ public class MainActivity extends AppCompatActivity {
             if (!myBluetoothAdapter.isEnabled()) {
                 Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBluetooth, 0);
+
+                while(true) {
+                    if(myBluetoothAdapter.isEnabled()) {
+                        promptPairDevice();
+                        break;
+                    }
+                }
             }
             //If the device has bluetooth enabled
             else {
@@ -447,21 +406,19 @@ public class MainActivity extends AppCompatActivity {
                 String name = spinner.getSelectedItem().toString();
                 for(BluetoothDevice device : pairedDevices){
                     if(name.equals(device.getName())){
-                        //System.out.println(device.getAddress());
                         myBluetoothDevice = myBluetoothAdapter.getRemoteDevice(device.getAddress());
-                        //dialog.cancel();
-                        //openBT();
+                        Toast.makeText(getApplicationContext(), "Connected to: " + myBluetoothDevice.getName(), Toast.LENGTH_SHORT).show();
                         readData();
                     }
                 }
-                //System.out.println("My Bluetooth Device is: " + myBluetoothDevice.getName());
             }
         });
 
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
+                Toast.makeText(getApplicationContext(), "You must connect to a device", Toast.LENGTH_SHORT).show();
+                //promptChooseDevice();
             }
         });
 
@@ -483,13 +440,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         intent.putExtra("Bluetooth Device", myBluetoothDevice);
-        startActivity(intent);
-    }
-
-    public void printUSBList(){
-        for(USB u : USBList){
-            System.out.println(u.toString());
+        try {
+            myBluetoothSocket.close();
         }
+        catch(IOException ex){
+
+        }
+        startActivity(intent);
     }
 
     //Reads from the file
@@ -502,7 +459,21 @@ public class MainActivity extends AppCompatActivity {
                 s = br.readLine();
                 while(s!=null){
                     StringTokenizer st = new StringTokenizer(s, ",");
-                    USBList.add(new USB(st.nextToken(), st.nextToken(), st.nextToken(), st.nextToken()));
+                    String n = st.nextToken();
+                    String pass = st.nextToken();
+                    String p = st.nextToken();
+                    String key = st.nextToken();
+
+                    //Calculates if the USB doesn't have a pin or doesn't have a password
+                    if(p.equals(" ")){
+                        p = "";
+                    }
+
+                    if(pass.equals(" ")){
+                        pass = "";
+                    }
+
+                    USBList.add(new USB(n, pass, p, key));
                     s = br.readLine();
                 }
             }
