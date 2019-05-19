@@ -1,0 +1,11 @@
+E:\dev\DIY-USB\DIY-USB\bin\Debug\DIY-USB.exe.config
+E:\dev\DIY-USB\DIY-USB\bin\Debug\DIY-USB.exe
+E:\dev\DIY-USB\DIY-USB\bin\Debug\DIY-USB.pdb
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY-USB.csprojResolveAssemblyReference.cache
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY_USB.Main.resources
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY_USB.Properties.Resources.resources
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY_USB.Setup.resources
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY-USB.csproj.GenerateResource.cache
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY-USB.csproj.CoreCompileInputs.cache
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY-USB.exe
+E:\dev\DIY-USB\DIY-USB\obj\Debug\DIY-USB.pdb
