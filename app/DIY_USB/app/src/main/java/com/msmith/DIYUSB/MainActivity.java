@@ -42,12 +42,14 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Various Objects needed for bluetooth
     BluetoothAdapter myBluetoothAdapter;
     BluetoothSocket myBluetoothSocket;
     BluetoothDevice myBluetoothDevice;
     OutputStream myOutputStream;
     InputStream myInputStream;
 
+    //Stores the usbToDecrypt
     String usbToDecrypt = "";
 
     Set<BluetoothDevice> pairedDevices;
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     USB theUSBToDecrypt;
     Boolean hasPassword = true;
     Boolean hasPin = true;
+
+    Boolean readData = true;
 
     UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); //Standard SerialPortService ID
 
@@ -89,10 +93,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    myBluetoothSocket = myBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
-                    myBluetoothSocket.connect();
-                    myInputStream = myBluetoothSocket.getInputStream();
-                    myOutputStream = myBluetoothSocket.getOutputStream();
+                    if(myBluetoothSocket == null) {
+                        myBluetoothSocket = myBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                        myBluetoothSocket.connect();
+                        myInputStream = myBluetoothSocket.getInputStream();
+                        myOutputStream = myBluetoothSocket.getOutputStream();
+                    }
 
                     BufferedReader br = new BufferedReader(new InputStreamReader(myInputStream));
 
@@ -106,13 +112,15 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 catch(IOException ex){
-                    //Tells the user an error occured
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getApplicationContext(), "Error: Couldn't connect to the Bluetooth Device", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    if(readData) {
+                        //Tells the user an error occured
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "Error: Couldn't connect to the Bluetooth Device", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
             }
         }).start();
@@ -285,7 +293,6 @@ public class MainActivity extends AppCompatActivity {
             myOutputStream.write(50);
             Toast.makeText(getApplicationContext(), "USB Decrypted!", Toast.LENGTH_SHORT).show();
             System.out.println("Sent Decrypt Signal");
-            myBluetoothSocket.close();
             readData();
 
         } catch (IOException ex) {
@@ -327,7 +334,12 @@ public class MainActivity extends AppCompatActivity {
         btnAddNewUSB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openEditUSB();
+                if(myBluetoothDevice != null) {
+                    openEditUSB();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "You must connect to a device", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -336,14 +348,71 @@ public class MainActivity extends AppCompatActivity {
         btnDeleteAllUSB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                USBList.clear();
-                TableLayout table = (TableLayout) findViewById(R.id.tableUSB);
-                table.removeAllViews();
-                update();
+                promptDeleteUSB();
+            }
+        });
+
+        Button btnBluetooth = (Button) findViewById(R.id.btnConnectToComputer);
+        btnBluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                promptPairDevice();
             }
         });
     }
 
+
+    public void promptDeleteUSB(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_dropdown, null);
+        builder.setTitle("Delete a USB");
+        final Spinner spinner = (Spinner) view.findViewById(R.id.dropDown);
+
+        //Gets the names of a USB
+        List<String> usbNames = new ArrayList<>();
+        for(USB u : USBList){
+            usbNames.add(u.name);
+        }
+
+        //Sets the items of the spinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_item, usbNames);
+        adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String name = spinner.getSelectedItem().toString();
+                //Deletes the USB with the same name
+                for(USB u : USBList){
+                    if(u.name.equals(name)){
+                        //Removes the USB
+                        USBList.remove(u);
+                        //Updates the file of USBs
+                        update();
+                        //Removes all of the items from the table
+                        TableLayout table = (TableLayout) findViewById(R.id.tableUSB);
+                        table.removeAllViews();
+                        //Displays the new USBs
+                        displayUSBs();
+
+                        break;
+                    }
+                }
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+
+        builder.setView(view);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
     public void promptPairDevice(){
         myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -407,7 +476,8 @@ public class MainActivity extends AppCompatActivity {
                 for(BluetoothDevice device : pairedDevices){
                     if(name.equals(device.getName())){
                         myBluetoothDevice = myBluetoothAdapter.getRemoteDevice(device.getAddress());
-                        Toast.makeText(getApplicationContext(), "Connected to: " + myBluetoothDevice.getName(), Toast.LENGTH_SHORT).show();
+                        myBluetoothSocket = null;
+                        Toast.makeText(getApplicationContext(), "Device: " + myBluetoothDevice.getName(), Toast.LENGTH_SHORT).show();
                         readData();
                     }
                 }
@@ -440,6 +510,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         intent.putExtra("Bluetooth Device", myBluetoothDevice);
+        readData = false;
         try {
             myBluetoothSocket.close();
         }
@@ -492,7 +563,7 @@ public class MainActivity extends AppCompatActivity {
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
             TextView t = new TextView(this);
-            t.setText(u.getName());
+            t.setText(u.name);
             t.setTextSize(25);
             tr.addView(t);
 

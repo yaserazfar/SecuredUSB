@@ -20,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -65,6 +66,9 @@ public class EditUSB extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_usb);
 
+        ImageView image = (ImageView) findViewById(R.id.imageTick);
+        image.setImageResource(R.mipmap.cross);
+
         //Gets the USB list
         Boolean moreUSBs = true;
         int count = 0;
@@ -89,6 +93,8 @@ public class EditUSB extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
         }
 
+        readData();
+
         //Sets up the password switch
         final Switch passwordSwitch = (Switch) findViewById(R.id.switchPassword);
         //Sets up the password button
@@ -102,7 +108,7 @@ public class EditUSB extends AppCompatActivity {
         //Sets up the confirm button on click method
         Button btnConfirm = (Button)findViewById(R.id.btnConfirm);
         //Sets up the sync usb button on click method
-        Button btnSyncUSB = (Button)findViewById(R.id.btnSyncUSB);
+        //Button btnSyncUSB = (Button)findViewById(R.id.btnSyncUSB);
 
         //On password switch value chang
         passwordSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -224,10 +230,12 @@ public class EditUSB extends AppCompatActivity {
             }
         });
 
+        /*
         //The on click event method for the sync USB button
         btnSyncUSB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 //If the usbkey has not been set
                 if(usbKey.equals("")) {
                     workerThread = new Thread(new Runnable() {
@@ -284,9 +292,125 @@ public class EditUSB extends AppCompatActivity {
                 }
 
             }
+
         });
+        */
     }
 
+    //Reads data from bluetooth
+    public void readData(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if(myBluetoothSocket == null) {
+                        myBluetoothSocket = myBluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+                        myBluetoothSocket.connect();
+                        myInputStream = myBluetoothSocket.getInputStream();
+                        myOutputStream = myBluetoothSocket.getOutputStream();
+                    }
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(myInputStream));
+                    String recieved = "";
+                    while(!recieved.equals("1")){
+                        recieved = br.readLine();
+                        System.out.println("Received: " + recieved);
+
+                        if(recieved.equals("1")){
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    prompt4DigitCode();
+                                }
+                            });
+                        }
+                    }
+                } catch (IOException ex) {
+
+                }
+            }
+        }).start();
+    }
+
+    public void prompt4DigitCode(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View view = getLayoutInflater().inflate(R.layout.dialog_password, null);
+        builder.setTitle("Enter 4 Digit Code");
+
+        final EditText result = view.findViewById(R.id.txtPassword);
+        result.setInputType(InputType.TYPE_CLASS_NUMBER);
+        result.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String code = result.getText().toString();
+                System.out.println(code);
+                sendData(code);
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                readData();
+
+            }
+        });
+
+        builder.setView(view);
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public void sendData(final String data){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Attempting to send :" + data);
+                    //Sends the data
+                    OutputStreamWriter ow = new OutputStreamWriter(myOutputStream);
+                    myOutputStream.write(data.getBytes());
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(myInputStream));
+
+                    String key = "";
+                    while(key.equals("")) {
+                        key = br.readLine();
+                        System.out.println("Received key: " + key);
+                        if (key.equals("e")) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "Incorrect Code", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            readData();
+                        } else {
+                            usbKey = key;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getApplicationContext(), "USB Synced", Toast.LENGTH_SHORT).show();
+                                    ImageView image = (ImageView) findViewById(R.id.imageTick);
+                                    image.setImageResource(R.mipmap.tick);
+                                }
+                            });
+                        }
+                    }
+                }
+                catch(IOException ex){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Error: Couldn't communicate with device", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).start();
+    }
 
     //Opens the main activity and gives a USB object back to the main activity
     public void openMainActivity(){
