@@ -7,8 +7,7 @@ namespace Serial_Port_Application
     public partial class Form1 : Form
     {
         static SerialPort port;
-        public static int UniqueUsbKey = 0; //this is a key that will be given to every usb and is different for each usb *would potentially be in the cloud*
-        //public static List<int> UsbKeyList = new List<int>();
+        public static int UniqueUsbKey = 0; //this is a key that will be given to every usb and is different for each usb *potentially in the cloud*
 
         public Form1()
         {
@@ -17,7 +16,6 @@ namespace Serial_Port_Application
 
             port.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);     //When the serial port receives data (from the phone), it will call the function "port_DataReceived"
             port.Open();
-
         }
         
         private void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -34,26 +32,32 @@ namespace Serial_Port_Application
                 //UsbKeyList.Add(UniqueUsbKey);
                 
                 TextBox.CheckForIllegalCrossThreadCalls = false;
-                listBoxUsb.Items.Add("USB #" + UniqueUsbKey);
+                textBox1.Text = "USB Connected.";
             }
 
             if (recievedString == "2")  //once the decrypt button is clicked, it will notify user on mobile and if yes then 2
             {
-                //TextBox.CheckForIllegalCrossThreadCalls = false;
-                //labelStatus.Text = "Decrypting files...";
+                TextBox.CheckForIllegalCrossThreadCalls = false;
+                textBox1.Text = "Decrypting USB...";
 
                 //===========------------TO DO DANIEL-------================
                 //decrypt usb information onto pc 
+      
+                TextBox.CheckForIllegalCrossThreadCalls = false;
+                textBox1.Text = "USB Decrypted.";
             }
         }
 
         private void buttonEncrypt_Click(object sender, EventArgs e)
         {
-            //TextBox.CheckForIllegalCrossThreadCalls = false;
-            //labelStatus.Text = "Encrypting files...";
+            TextBox.CheckForIllegalCrossThreadCalls = false;
+            textBox1.Text = "Encrypting USB...";
 
             //=============------------TO DO DANIEL-------====================
             //encrypt the files 
+
+            TextBox.CheckForIllegalCrossThreadCalls = false;
+            textBox1.Text = "USB Encrypted.";
         }
 
         private void buttonDecrypt_Click(object sender, EventArgs e)    //sends key to user and promts them to unlock phone 
