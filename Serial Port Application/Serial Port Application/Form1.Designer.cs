@@ -28,16 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.label1 = new System.Windows.Forms.Label();
             this.buttonEncrypt = new System.Windows.Forms.Button();
             this.buttonDecrypt = new System.Windows.Forms.Button();
+            this.listBoxUsb = new System.Windows.Forms.ListBox();
             this.labelStatus = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(39, 34);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(95, 17);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Select a USB:";
             // 
             // buttonEncrypt
             // 
-            this.buttonEncrypt.Location = new System.Drawing.Point(42, 83);
+            this.buttonEncrypt.Location = new System.Drawing.Point(42, 178);
             this.buttonEncrypt.Name = "buttonEncrypt";
             this.buttonEncrypt.Size = new System.Drawing.Size(146, 44);
             this.buttonEncrypt.TabIndex = 8;
@@ -47,13 +56,22 @@
             // 
             // buttonDecrypt
             // 
-            this.buttonDecrypt.Location = new System.Drawing.Point(245, 83);
+            this.buttonDecrypt.Location = new System.Drawing.Point(248, 178);
             this.buttonDecrypt.Name = "buttonDecrypt";
             this.buttonDecrypt.Size = new System.Drawing.Size(146, 44);
             this.buttonDecrypt.TabIndex = 9;
             this.buttonDecrypt.Text = "Decrypt Files";
             this.buttonDecrypt.UseVisualStyleBackColor = true;
             this.buttonDecrypt.Click += new System.EventHandler(this.buttonDecrypt_Click);
+            // 
+            // listBoxUsb
+            // 
+            this.listBoxUsb.FormattingEnabled = true;
+            this.listBoxUsb.ItemHeight = 16;
+            this.listBoxUsb.Location = new System.Drawing.Point(42, 54);
+            this.listBoxUsb.Name = "listBoxUsb";
+            this.listBoxUsb.Size = new System.Drawing.Size(352, 100);
+            this.listBoxUsb.TabIndex = 10;
             // 
             // labelStatus
             // 
@@ -63,35 +81,17 @@
             this.labelStatus.Size = new System.Drawing.Size(0, 17);
             this.labelStatus.TabIndex = 11;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(39, 41);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(56, 17);
-            this.label1.TabIndex = 12;
-            this.label1.Text = "Status: ";
-            // 
-            // textBox1
-            // 
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.textBox1.Location = new System.Drawing.Point(101, 41);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(290, 15);
-            this.textBox1.TabIndex = 13;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.InactiveCaptionText;
-            this.ClientSize = new System.Drawing.Size(447, 196);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
+            this.ClientSize = new System.Drawing.Size(447, 262);
             this.Controls.Add(this.labelStatus);
+            this.Controls.Add(this.listBoxUsb);
             this.Controls.Add(this.buttonDecrypt);
             this.Controls.Add(this.buttonEncrypt);
+            this.Controls.Add(this.label1);
             this.ForeColor = System.Drawing.SystemColors.ActiveCaption;
             this.Name = "Form1";
             this.Text = "DIY USB";
@@ -101,11 +101,11 @@
         }
 
         #endregion
+        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button buttonEncrypt;
         private System.Windows.Forms.Button buttonDecrypt;
+        private System.Windows.Forms.ListBox listBoxUsb;
         private System.Windows.Forms.Label labelStatus;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
     }
 }
 

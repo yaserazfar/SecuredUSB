@@ -8,3 +8,22 @@ C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\
 C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.pdb
 C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.exe
 C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.pdb
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe.config
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.pdb
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csprojAssemblyReference.cache
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Form1.resources
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Properties.Resources.resources
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.GenerateResource.cache
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.CoreCompileInputs.cache
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.exe
+C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.pdb
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe.config
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.pdb
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Form1.resources
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Properties.Resources.resources
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.GenerateResource.Cache
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.CoreCompileInputs.cache
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.exe
+\\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.pdb
