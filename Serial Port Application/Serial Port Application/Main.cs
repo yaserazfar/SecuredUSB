@@ -38,7 +38,6 @@ namespace Serial_Port_Application
                 {
                     if (code == Verify.code)
                     {
-                        UniqueUsbKey = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                         port.WriteLine(UniqueUsbKey.ToString());
                     }
                     else
@@ -62,13 +61,16 @@ namespace Serial_Port_Application
 
         private void buttonEncrypt_Click(object sender, EventArgs e)
         {
-            //This encrypts the current directory that the EXE runs in. PLEASE NOTE: This means you can't really test this by just running it, drop the exe
-            //In the folder you want to test and run it there instead.
-            string sourceDirectory = Application.StartupPath;
-            string targetDirectory = Application.StartupPath;
+            FolderBrowserDialog folderBrowserDialog1 = new FolderBrowserDialog();
+            if (folderBrowserDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                //This encrypts the current directory that the EXE runs in. PLEASE NOTE: This means you can't really test this by just running it, drop the exe
+                //In the folder you want to test and run it there instead.
+                string sourceDirectory = folderBrowserDialog1.SelectedPath;
+                string targetDirectory = Application.StartupPath;
 
-            Copy(sourceDirectory, targetDirectory, true);
-
+                Copy(sourceDirectory, targetDirectory, true);
+            }
         }
 
         private void buttonDecrypt_Click(object sender, EventArgs e)    //sends key to user and promts them to unlock phone 
@@ -77,10 +79,10 @@ namespace Serial_Port_Application
             if (folderBrowserDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 destinationFile = (folderBrowserDialog1.SelectedPath);
+                //MessageBox.Show(destinationFile);
+                //send UniqueUsbKey of seleceted USB to port - selected from listbox
+                port.WriteLine(UniqueUsbKey.ToString());
             }
-            //MessageBox.Show(destinationFile);
-            //send UniqueUsbKey of seleceted USB to port - selected from listbox
-            port.WriteLine(UniqueUsbKey.ToString());
         }
 
 
@@ -136,12 +138,15 @@ namespace Serial_Port_Application
 
             foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
             {
-                DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
-                EncryptAll(diSourceSubDir, nextTargetSubDir);
-                //Delete any empty folder dupes
-                if (!Directory.EnumerateFileSystemEntries(diSourceSubDir.FullName).Any())
+                if (Path.GetFileName(diSourceSubDir.Name) != "System Volume Information")
                 {
-                    diSourceSubDir.Delete();
+                    DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
+                    EncryptAll(diSourceSubDir, nextTargetSubDir);
+                    //Delete any empty folder dupes
+                    if (!Directory.EnumerateFileSystemEntries(diSourceSubDir.FullName).Any())
+                    {
+                        diSourceSubDir.Delete();
+                    }
                 }
 
             }
@@ -154,28 +159,39 @@ namespace Serial_Port_Application
         /// <param name="target"></param>
         private void DecryptAll(DirectoryInfo source, DirectoryInfo target)
         {
-            Directory.CreateDirectory(target.FullName);
-
-            foreach (FileInfo fi in source.GetFiles())
+            try
             {
-                Encrypt test = new Encrypt();
-                string pass = "klsjndvsodvn";
-                string destinationFile;
+                Directory.CreateDirectory(target.FullName);
 
-                //Decrypt only if it is a .en file
-                if (Path.GetExtension(fi.Name) == ".en")
+                foreach (FileInfo fi in source.GetFiles())
                 {
-                    string fileName = fi.Name;
-                    fileName = Path.ChangeExtension(fileName, null);
-                    destinationFile = Path.Combine(target.FullName, fileName);
-                    test.DecryptFile(fi.FullName, destinationFile, pass, test.salt, 1000);
+                    Encrypt test = new Encrypt();
+                    string pass = "klsjndvsodvn";
+                    string destinationFile;
+
+                    //Decrypt only if it is a .en file
+                    if (Path.GetExtension(fi.Name).Contains(".en") && Path.GetFileName(fi.Name) != "id.en")
+                    {
+                        string fileName = fi.Name;
+                        fileName = Path.ChangeExtension(fileName, null);
+                        destinationFile = Path.Combine(target.FullName, fileName);
+                        test.DecryptFile(fi.FullName, destinationFile, pass, test.salt, 1000);
+
+                    }
+                }
+
+                foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+                {
+                    if (Path.GetFileName(diSourceSubDir.Name) != "System Volume Information")
+                    {
+                        DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
+                        DecryptAll(diSourceSubDir, nextTargetSubDir);
+                    }
                 }
             }
-
-            foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
+            catch (Exception e)
             {
-                DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
-                DecryptAll(diSourceSubDir, nextTargetSubDir);
+                MessageBox.Show(e.Message);
             }
         }
 

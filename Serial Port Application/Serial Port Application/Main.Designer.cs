@@ -39,10 +39,10 @@
             // 
             this.buttonEncrypt.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.buttonEncrypt.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.buttonEncrypt.Location = new System.Drawing.Point(71, 70);
-            this.buttonEncrypt.Margin = new System.Windows.Forms.Padding(2);
+            this.buttonEncrypt.Location = new System.Drawing.Point(95, 86);
+            this.buttonEncrypt.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonEncrypt.Name = "buttonEncrypt";
-            this.buttonEncrypt.Size = new System.Drawing.Size(110, 36);
+            this.buttonEncrypt.Size = new System.Drawing.Size(147, 44);
             this.buttonEncrypt.TabIndex = 8;
             this.buttonEncrypt.Text = "Encrypt Files";
             this.buttonEncrypt.UseVisualStyleBackColor = true;
@@ -52,10 +52,10 @@
             // 
             this.buttonDecrypt.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.buttonDecrypt.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.buttonDecrypt.Location = new System.Drawing.Point(71, 110);
-            this.buttonDecrypt.Margin = new System.Windows.Forms.Padding(2);
+            this.buttonDecrypt.Location = new System.Drawing.Point(95, 135);
+            this.buttonDecrypt.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.buttonDecrypt.Name = "buttonDecrypt";
-            this.buttonDecrypt.Size = new System.Drawing.Size(110, 36);
+            this.buttonDecrypt.Size = new System.Drawing.Size(147, 44);
             this.buttonDecrypt.TabIndex = 9;
             this.buttonDecrypt.Text = "Decrypt Files";
             this.buttonDecrypt.UseVisualStyleBackColor = true;
@@ -64,19 +64,19 @@
             // labelStatus
             // 
             this.labelStatus.AutoSize = true;
-            this.labelStatus.Location = new System.Drawing.Point(29, 183);
-            this.labelStatus.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.labelStatus.Location = new System.Drawing.Point(39, 225);
             this.labelStatus.Name = "labelStatus";
-            this.labelStatus.Size = new System.Drawing.Size(0, 13);
+            this.labelStatus.Size = new System.Drawing.Size(0, 17);
             this.labelStatus.TabIndex = 11;
             // 
             // buttonSetup
             // 
             this.buttonSetup.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.buttonSetup.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.buttonSetup.Location = new System.Drawing.Point(71, 12);
+            this.buttonSetup.Location = new System.Drawing.Point(95, 15);
+            this.buttonSetup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonSetup.Name = "buttonSetup";
-            this.buttonSetup.Size = new System.Drawing.Size(110, 36);
+            this.buttonSetup.Size = new System.Drawing.Size(147, 44);
             this.buttonSetup.TabIndex = 12;
             this.buttonSetup.Text = "Setup USB";
             this.buttonSetup.UseVisualStyleBackColor = true;
@@ -85,9 +85,10 @@
             // buttonQuit
             // 
             this.buttonQuit.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.buttonQuit.Location = new System.Drawing.Point(89, 159);
+            this.buttonQuit.Location = new System.Drawing.Point(119, 196);
+            this.buttonQuit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonQuit.Name = "buttonQuit";
-            this.buttonQuit.Size = new System.Drawing.Size(75, 23);
+            this.buttonQuit.Size = new System.Drawing.Size(100, 28);
             this.buttonQuit.TabIndex = 13;
             this.buttonQuit.Text = "Quit";
             this.buttonQuit.UseVisualStyleBackColor = true;
@@ -95,17 +96,17 @@
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
-            this.ClientSize = new System.Drawing.Size(258, 194);
+            this.ClientSize = new System.Drawing.Size(344, 249);
             this.Controls.Add(this.buttonQuit);
             this.Controls.Add(this.buttonSetup);
             this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.buttonDecrypt);
             this.Controls.Add(this.buttonEncrypt);
             this.ForeColor = System.Drawing.SystemColors.ActiveCaption;
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Main";
             this.Text = "SecureUSB";
             this.ResumeLayout(false);
