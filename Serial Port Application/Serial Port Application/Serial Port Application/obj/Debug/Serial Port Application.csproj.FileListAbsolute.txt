@@ -1,0 +1,10 @@
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csprojAssemblyReference.cache
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Form1.resources
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Properties.Resources.resources
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.GenerateResource.cache
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.CoreCompileInputs.cache
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe.config
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.pdb
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.exe
+C:\Users\Yaser\OneDrive\Desktop\Serial Port Application\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.pdb
