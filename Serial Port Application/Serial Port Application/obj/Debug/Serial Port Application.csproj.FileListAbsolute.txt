@@ -27,3 +27,14 @@ C:\Users\Yaser\Downloads\Serial Port Application\Serial Port Application\obj\Deb
 \\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.CoreCompileInputs.cache
 \\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.exe
 \\galaxy.its.waikato.ac.nz\HOME\Code\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.pdb
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csprojResolveAssemblyReference.cache
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Main.resources
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Properties.Resources.resources
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.GenerateResource.cache
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.csproj.CoreCompileInputs.cache
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.exe
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial Port Application.pdb
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe.config
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.exe
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\bin\Debug\Serial Port Application.pdb
+E:\dev\DIY_USB\Serial Port Application\Serial Port Application\obj\Debug\Serial_Port_Application.Verify.resources
