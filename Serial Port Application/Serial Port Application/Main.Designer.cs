@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.buttonEncrypt = new System.Windows.Forms.Button();
             this.buttonDecrypt = new System.Windows.Forms.Button();
             this.labelStatus = new System.Windows.Forms.Label();
@@ -74,7 +75,7 @@
             this.buttonSetup.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.buttonSetup.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.buttonSetup.Location = new System.Drawing.Point(95, 15);
-            this.buttonSetup.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonSetup.Margin = new System.Windows.Forms.Padding(4);
             this.buttonSetup.Name = "buttonSetup";
             this.buttonSetup.Size = new System.Drawing.Size(147, 44);
             this.buttonSetup.TabIndex = 12;
@@ -86,7 +87,7 @@
             // 
             this.buttonQuit.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.buttonQuit.Location = new System.Drawing.Point(119, 196);
-            this.buttonQuit.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonQuit.Margin = new System.Windows.Forms.Padding(4);
             this.buttonQuit.Name = "buttonQuit";
             this.buttonQuit.Size = new System.Drawing.Size(100, 28);
             this.buttonQuit.TabIndex = 13;
@@ -106,6 +107,7 @@
             this.Controls.Add(this.buttonDecrypt);
             this.Controls.Add(this.buttonEncrypt);
             this.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Main";
             this.Text = "SecureUSB";

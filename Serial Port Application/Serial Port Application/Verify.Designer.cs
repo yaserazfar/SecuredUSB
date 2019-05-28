@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Verify));
             this.txtCode = new System.Windows.Forms.TextBox();
             this.buttonOK = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -35,19 +36,21 @@
             // txtCode
             // 
             this.txtCode.Font = new System.Drawing.Font("Microsoft Sans Serif", 48F);
-            this.txtCode.Location = new System.Drawing.Point(39, 12);
+            this.txtCode.Location = new System.Drawing.Point(52, 15);
+            this.txtCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtCode.Multiline = true;
             this.txtCode.Name = "txtCode";
             this.txtCode.ReadOnly = true;
-            this.txtCode.Size = new System.Drawing.Size(159, 78);
+            this.txtCode.Size = new System.Drawing.Size(211, 95);
             this.txtCode.TabIndex = 0;
             // 
             // buttonOK
             // 
             this.buttonOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
-            this.buttonOK.Location = new System.Drawing.Point(80, 105);
+            this.buttonOK.Location = new System.Drawing.Point(107, 129);
+            this.buttonOK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.buttonOK.Name = "buttonOK";
-            this.buttonOK.Size = new System.Drawing.Size(76, 30);
+            this.buttonOK.Size = new System.Drawing.Size(101, 37);
             this.buttonOK.TabIndex = 1;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
@@ -55,11 +58,13 @@
             // 
             // Verify
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(244, 147);
+            this.ClientSize = new System.Drawing.Size(325, 181);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.txtCode);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Verify";
             this.Text = "Verify";
             this.ResumeLayout(false);
