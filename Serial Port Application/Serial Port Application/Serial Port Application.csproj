@@ -7,7 +7,7 @@
     <ProjectGuid>{760FB460-200C-4046-B81E-5DF1EC47B267}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Serial_Port_Application</RootNamespace>
-    <AssemblyName>Serial Port Application</AssemblyName>
+    <AssemblyName>SecureUSB</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
