@@ -9,6 +9,7 @@ namespace Serial_Port_Application
 {
     public partial class Main : Form
     {
+        Verify verify;
         public static SerialPort port;
         public static long UniqueUsbKey = -1; //this is a key that will be given to every usb and is different for each usb *would potentially be in the cloud*
         //public static List<int> UsbKeyList = new List<int>();
@@ -18,9 +19,15 @@ namespace Serial_Port_Application
         public Main()
         {
             InitializeComponent();
-            StreamReader r = new StreamReader(Path.Combine(Application.StartupPath, "id.en"));
-            UniqueUsbKey = Convert.ToInt64(r.ReadLine());
-            r.Close();
+            if (File.Exists(Path.Combine(Application.StartupPath, "id.en")))
+            {
+                StreamReader r = new StreamReader(Path.Combine(Application.StartupPath, "id.en"));
+                UniqueUsbKey = Convert.ToInt64(r.ReadLine());
+                r.Close();
+                buttonDecrypt.Enabled = true;
+                buttonEncrypt.Enabled = true;
+                buttonSetup.Enabled = false;
+            }
 
             port = new SerialPort("COM3", 9600, Parity.None, 8, StopBits.One);              //REPLACE COM3 WITH YOUR BLUETOOTH PORT (DeviceManager->Ports->StandardBluetooth...)
             port.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);     //When the serial port receives data (from the phone), it will call the function "port_DataReceived"
@@ -38,7 +45,15 @@ namespace Serial_Port_Application
                 {
                     if (code == Verify.code)
                     {
+                        UniqueUsbKey = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                        StreamWriter w = new StreamWriter(Path.Combine(Application.StartupPath, "id.en"));
+                        w.WriteLine(UniqueUsbKey);
+                        w.Close();
+                        buttonDecrypt.Enabled = true;
+                        buttonEncrypt.Enabled = true;
+                        buttonSetup.Enabled = false;
                         port.WriteLine(UniqueUsbKey.ToString());
+                        verify.Close();
                     }
                     else
                     {
@@ -130,10 +145,15 @@ namespace Serial_Port_Application
                 //Make sure it isn't already encrypted or the executable
                 if (Path.GetExtension(fi.Name) != ".en" && fi.Name != AppDomain.CurrentDomain.FriendlyName)
                 {
+                    //File.Delete(fi.FullName + ".en");
+                    //string toDelete = Path.Combine(target.FullName, fi.FullName + ".en");
+                    if (File.Exists(destinationFile))
+                    {
+                        File.Delete(destinationFile);
+                    }
                     encrypt.EncryptFile(fi.FullName, destinationFile, pass, encrypt.salt, 1000);
                     fi.Delete();
                 }
-
             }
 
             foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
@@ -205,7 +225,7 @@ namespace Serial_Port_Application
 
         private void buttonSetup_Click(object sender, EventArgs e)
         {
-            Verify verify = new Verify();
+            verify = new Verify();
             verify.ShowDialog();
         }
 

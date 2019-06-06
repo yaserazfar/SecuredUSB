@@ -38,6 +38,7 @@
             // 
             // buttonEncrypt
             // 
+            this.buttonEncrypt.Enabled = false;
             this.buttonEncrypt.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.buttonEncrypt.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.buttonEncrypt.Location = new System.Drawing.Point(95, 86);
@@ -51,6 +52,7 @@
             // 
             // buttonDecrypt
             // 
+            this.buttonDecrypt.Enabled = false;
             this.buttonDecrypt.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.buttonDecrypt.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.buttonDecrypt.Location = new System.Drawing.Point(95, 135);
